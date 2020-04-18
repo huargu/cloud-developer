@@ -18,13 +18,40 @@ router.get('/', async (req: Request, res: Response) => {
 
 //@TODO
 //Add an endpoint to GET a specific resource by Primary Key
+router.get('/:id', async (req: Request, res: Response) => {
+    let { id } = req.params;
+
+    if (!id) {
+        return res.status(400).send({ message: 'Id is required or malformed' });
+    }
+    const item = await FeedItem.findByPk(id);
+
+    if (!item) {
+        return res.status(204).send({ message: 'Post not found'});
+    }
+
+    res.send(item);
+});
 
 // update a specific resource
 router.patch('/:id', 
     requireAuth, 
     async (req: Request, res: Response) => {
-        //@TODO try it yourself
-        res.send(500).send("not implemented")
+
+        if (!req.params.id) {
+            return res.status(400).send({ message: 'Id is required or malformed' });
+        }
+
+        FeedItem.update(
+            {
+                caption: req.body.caption,
+                url: req.body.url
+            },
+            {returning: true, where: {id: req.params.id} }
+        )
+        .then(function([ rowsUpdate, [updatedFeed] ]) {
+            res.status(201).send(updatedFeed);
+          });
 });
 
 

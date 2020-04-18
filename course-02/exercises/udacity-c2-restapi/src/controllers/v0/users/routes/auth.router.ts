@@ -12,14 +12,27 @@ const router: Router = Router();
 
 async function generatePassword(plainTextPassword: string): Promise<string> {
     //@TODO Use Bcrypt to Generated Salted Hashed Passwords
+    bcrypt.hash(plainTextPassword, 10, function(err, hash: string) {
+        return hash;
+      });
+
+    return '';
 }
 
 async function comparePasswords(plainTextPassword: string, hash: string): Promise<boolean> {
-    //@TODO Use Bcrypt to Compare your password to your Salted Hashed Password
+    bcrypt.compare(plainTextPassword, hash, function(err, res) {
+        if(res) {
+         return true;
+        } else {
+         return false;
+        } 
+      });
+
+      return false;
 }
 
 function generateJWT(user: User): string {
-    //@TODO Use jwt to create a new JWT Payload containing
+    return jwt.sign({ tokenuser: User}, 'udagram');
 }
 
 export function requireAuth(req: Request, res: Response, next: NextFunction) {
